@@ -43,8 +43,8 @@ export default function Home() {
             </Link>
             <Link href="/ranked" className={styles.mode}>
               <span className="label">Quick</span>
-              <span className={styles.modeTitle}>Ranked draft</span>
-              <span className="muted">All Pick with ban nominations and pick suggestions for your role.</span>
+              <span className={styles.modeTitle}>Ranked helper</span>
+              <span className="muted">Enter your real ranked game and get pick suggestions for your role.</span>
             </Link>
             <Link href="/play" className={styles.mode}>
               <span className="label">Mode 02</span>

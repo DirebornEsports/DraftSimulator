@@ -89,3 +89,30 @@
   .suggGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .rolls { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+
+/* ---------- Manual helper ---------- */
+.helperTop { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-bottom: 18px; }
+.helperCfg { display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap; }
+.posRowSm { display: flex; gap: 6px; }
+.posBtnSm { width: 58px; height: 48px; border-radius: 12px; border: 1px solid #2a2a2a; background: #0e0e0e; color: var(--text); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; transition: background-color .15s ease, border-color .15s ease; }
+.posBtnSm b { font-family: var(--font-display); font-size: 15px; }
+.posBtnSm span { font-size: 9px; color: var(--muted); }
+.slotWrap { position: relative; }
+.slotBtn { width: 100%; padding: 0; text-align: left; color: inherit; cursor: pointer; }
+.slotTarget { border: 1px solid var(--accent) !important; box-shadow: 0 0 0 1px var(--accent), 0 0 16px rgba(255, 61, 0, .35); }
+.remove { position: absolute; top: 4px; right: 4px; z-index: 3; width: 22px; height: 22px; border-radius: 50%; border: none; background: rgba(11, 11, 11, .8); color: #ededed; font-size: 14px; line-height: 1; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .15s ease; }
+.slotWrap:hover .remove, .remove:focus-visible { opacity: 1; }
+.remove:hover { background: var(--accent); color: var(--accent-ink); }
+.targetBar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.targetBtns { display: flex; gap: 4px; background: #0e0e0e; border: 1px solid #242424; border-radius: 999px; padding: 4px; }
+.targetBtns button { border: none; border-radius: 999px; padding: 8px 14px; font-size: 13px; background: transparent; color: #a3a3a3; transition: background-color .2s ease, color .2s ease; }
+.targetNow { font-size: 14px; color: var(--accent-soft); }
+.suggGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.cardCon { font-size: 11px; color: #7f7f7f; padding: 0 8px 8px; line-height: 1.35; margin-top: -4px; }
+.teamHeadBtn { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: none; border: 1px solid transparent; border-radius: 10px; padding: 4px 6px; margin: -4px -6px 0; color: var(--text); text-align: left; transition: border-color .2s ease; }
+.teamHeadBtn:hover { border-color: #333; }
+.headTarget { border-color: var(--accent); box-shadow: 0 0 12px rgba(255, 61, 0, .3); }
+.enemyPos select { appearance: none; -webkit-appearance: none; background: rgba(11, 11, 11, .82); color: #ededed; border: 1px solid rgba(255, 255, 255, .25); border-radius: 999px; font-size: 11px; padding: 3px 8px; cursor: pointer; }
+.banBtn { padding: 0; border: none; cursor: pointer; }
+.summary { display: flex; flex-direction: column; gap: 12px; }
+@media (max-width: 1200px) { .suggGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
