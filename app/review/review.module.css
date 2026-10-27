@@ -49,3 +49,24 @@
 @media (max-width: 1100px) {
   .topGrid, .bottom { grid-template-columns: 1fr; }
 }
+
+.statsNote { font-size: 11px; font-weight: 500; opacity: .8; }
+.lanesGrid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px; margin-bottom: 20px; }
+.posPanel { padding: 20px 22px; display: flex; flex-direction: column; gap: 4px; }
+.posRow { display: grid; grid-template-columns: 84px minmax(0, 1fr) 150px 34px; gap: 14px; align-items: center; padding: 10px 0; border-bottom: 1px solid #1f1f1f; }
+.posImg { width: 84px; border-radius: 6px; }
+.posText { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.posHero { font-size: 15px; font-weight: 500; }
+.posWhy { font-size: 12px; color: #b5b5b5; line-height: 1.4; }
+.posSelect select { width: 100%; height: 36px; background: var(--bg); border: 1px solid #2a2a2a; border-radius: 10px; color: var(--text); font-size: 13px; padding: 0 8px; cursor: pointer; transition: border-color .2s ease; }
+.posSelect select:hover, .posSelect select:focus { border-color: var(--accent); outline: none; }
+.laneCol { display: flex; flex-direction: column; gap: 14px; }
+.lane { padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+.laneVs { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 12px; align-items: center; }
+.laneSide { display: flex; gap: 8px; }
+.laneSide:last-child { justify-content: flex-end; }
+.laneHero { width: 80px; display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: #bdbdbd; }
+.laneHero span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vs { color: var(--accent-soft); font-size: 14px; }
+.laneNote { font-size: 13px; color: #b5b5b5; }
+@media (max-width: 1100px) { .lanesGrid { grid-template-columns: 1fr; } .posRow { grid-template-columns: 64px minmax(0, 1fr); } .posImg { width: 64px; } }

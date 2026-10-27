@@ -35,8 +35,15 @@ Score = 30 + 0.6 × meta strength + counter value + composition needs, clamped t
 Tiers: S ≥ 85, A ≥ 75, B ≥ 65, C ≥ 55, D ≥ 45, F below.
 
 ## Draft order & timer
-`lib/draft.js` — 7 bans · 2 picks · 3 bans · 6 picks · 4 bans · 2 picks (order introduced in 7.34); 15 s per ban in ban phase 1, 30 s otherwise, 130 s reserve. A timed-out ban is lost; a timed-out pick is random.
+`lib/draft.js` — current order (patch 7.40, unchanged through 7.41f): bans F F S S F S S · picks F S · bans F F S · picks S F F S S F · bans F S F S · picks F S. 15 s per ban in ban phase 1, 30 s otherwise, 130 s reserve. A timed-out ban is lost; a timed-out pick is random.
 Re-check against the current patch notes when Valve changes the draft.
+
+## Positions & lanes (lib/positions.js)
+Captains set Pos 1–5 or Flex for each picked hero (on the board or in the review). Unset heroes are auto-assigned to the best open position.
+- Position fit: estimated from OpenDota hero roles (Carry, Support, Initiator, Durable, ...).
+- Flex: hero is placed at its best open position; a real flex (fits 2+ positions) earns a small bonus.
+- Lanes: safe (1+5 vs 3+4), mid (2 vs 2), off (3+4 vs 1+5) graded from head-to-head win rates. Opponent positions are estimated.
+- Final grade = 70% picks & bans + 15% positions + 15% lanes.
 
 ## Next steps
 - Move teams and history from browser storage to Postgres (Vercel Marketplace).

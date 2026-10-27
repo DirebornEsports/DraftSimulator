@@ -6,8 +6,9 @@ import { useSearchParams } from 'next/navigation';
 import { Header, Gauge, TierChip, HeroImg } from '@/components/ui';
 import { PHASES } from '@/lib/draft';
 import { overallGrade, tierOf } from '@/lib/grade';
-import { useHeroes } from '@/lib/useHeroes';
-import { getEntry, getHistory } from '@/lib/store';
+import { useHeroes, useMatchups } from '@/lib/useHeroes';
+import { getEntry, getHistory, updateEntry } from '@/lib/store';
+import { POSITIONS, POS_NAME, POS_SHORT, resolvePositions, bestAssignment, laneReport, finalGrade } from '@/lib/positions';
 import styles from './review.module.css';
 
 export default function ReviewPage() {
@@ -31,18 +32,41 @@ function Review() {
   const params = useSearchParams();
   const { byId, loading } = useHeroes();
   const [entry, setEntry] = useState(undefined);
+  const [chosen, setChosen] = useState({});
+  const { matchups, ensure } = useMatchups();
 
   useEffect(() => {
     const id = params.get('id');
     const e = id ? getEntry(id) : getHistory().find((x) => x.kind === 'draft');
     setEntry(e || null);
+    setChosen((e && e.positions) || {});
   }, [params]);
+
+  useEffect(() => {
+    if (!entry) return;
+    ensure([...entry.picks[1], ...entry.picks[2]].filter(Boolean));
+  }, [entry, ensure]);
+
+  const setPos = (heroId, value) => {
+    const next = { ...chosen, [heroId]: value };
+    if (!value) delete next[heroId];
+    setChosen(next);
+    if (entry) updateEntry(entry.id, { positions: next });
+  };
 
   if (entry === undefined || loading) return <Frame><div className="center-note">Loading review…</div></Frame>;
   if (!entry) return <Frame><div className="center-note">No finished draft found. <Link href="/draft">Start one</Link>.</div></Frame>;
 
   const log = entry.log;
-  const g = overallGrade(log);
+  const draftG = overallGrade(log);
+  const myIds = entry.picks[entry.userTeam].filter(Boolean);
+  const theirIds = entry.picks[entry.userTeam === 1 ? 2 : 1].filter(Boolean);
+  const mine = resolvePositions(myIds, chosen, byId);
+  const theirFinal = bestAssignment(theirIds, byId);
+  const lanesReady = [...myIds, ...theirIds].every((id) => id in matchups);
+  const lanes = lanesReady ? laneReport({ myFinal: mine.final, theirFinal, byId, matchups }) : [];
+  const g = lanesReady ? finalGrade({ draftScore: draftG.score, posRows: mine.rows, lanes }) : { ...draftG, posAvg: null, laneAvg: null };
+  const theirByPos = Object.fromEntries(Object.entries(theirFinal).map(([id, p]) => [p, Number(id)]));
   const goodCount = log.filter((l) => l.tier === 'S' || l.tier === 'A').length;
   const lowCount = log.filter((l) => 'CDF'.includes(l.tier)).length;
   const phases = PHASES.map((p) => {
@@ -86,10 +110,11 @@ function Review() {
           <span className={styles.overallHead}>Overall draft</span>
           <Gauge score={g.score} tier={g.tier} sub={g.score + ' / 100'} size={180} onOrange />
           <div className={styles.stats}>
-            <span>Actions<b>{log.length}</b></span>
-            <span>S / A<b>{goodCount}</b></span>
-            <span>C or lower<b>{lowCount}</b></span>
+            <span>Picks &amp; bans<b>{draftG.score}</b></span>
+            <span>Positions<b>{g.posAvg ?? '…'}</b></span>
+            <span>Lanes<b>{g.laneAvg ?? '…'}</b></span>
           </div>
+          <span className={styles.statsNote}>{goodCount} actions graded S/A · {lowCount} graded C or lower</span>
         </div>
 
         <div className={'panel anim-up ' + styles.phases} style={{ '--d': '80ms' }}>
@@ -111,6 +136,51 @@ function Review() {
               </g>
             ))}
           </svg>
+        </div>
+      </div>
+
+      <div className={'anim-up ' + styles.lanesGrid} style={{ '--d': '200ms' }}>
+        <div className={'panel ' + styles.posPanel}>
+          <div className={styles.row}><span className="label">Your positions</span><span className="muted" style={{ fontSize: 12 }}>Change a position and the grade updates</span></div>
+          {mine.rows.map((r) => (
+            <div key={r.heroId} className={styles.posRow}>
+              <HeroImg hero={byId[r.heroId]} className={styles.posImg} />
+              <div className={styles.posText}>
+                <span className={styles.posHero}>{byId[r.heroId].name}</span>
+                <span className="muted" style={{ fontSize: 12 }}>
+                  {r.flex ? 'Flex → played as ' + POS_SHORT[r.pos] : r.auto ? 'Auto: ' + POS_NAME[r.pos] : POS_NAME[r.pos]}
+                </span>
+                <span className={styles.posWhy}>{r.flexNote ? r.flexNote + '. ' : ''}{r.reason}.</span>
+              </div>
+              <label className={styles.posSelect}>
+                <span className="sr-only">Position for {byId[r.heroId].name}</span>
+                <select value={chosen[r.heroId] || ''} onChange={(e) => setPos(r.heroId, e.target.value)}>
+                  <option value="">Auto</option>
+                  {POSITIONS.map((p) => {
+                    const taken = Object.entries(chosen).some(([id, v]) => v === p && Number(id) !== r.heroId);
+                    return <option key={p} value={p} disabled={taken}>Pos {p} · {POS_SHORT[p]}</option>;
+                  })}
+                  <option value="flex">Flex</option>
+                </select>
+              </label>
+              <TierChip tier={r.tier} size={30} />
+            </div>
+          ))}
+        </div>
+        <div className={styles.laneCol}>
+          {!lanesReady && <div className="panel center-note" style={{ padding: 30 }}>Loading lane matchups…</div>}
+          {lanes.map((l) => (
+            <div key={l.key} className={'panel ' + styles.lane}>
+              <div className={styles.row}><span className="label">{l.name}</span><TierChip tier={l.tier} size={30} /></div>
+              <div className={styles.laneVs}>
+                <div className={styles.laneSide}>{l.mineIds.map((id) => <span key={id} className={styles.laneHero}><HeroImg hero={byId[id]} /><span>{byId[id].name}</span></span>)}</div>
+                <span className={'display ' + styles.vs}>vs</span>
+                <div className={styles.laneSide}>{l.theirIds.map((id) => <span key={id} className={styles.laneHero}><HeroImg hero={byId[id]} /><span>{byId[id].name}</span></span>)}</div>
+              </div>
+              {l.notes.map((n, i) => <span key={i} className={styles.laneNote}>{n}</span>)}
+            </div>
+          ))}
+          {lanesReady && <span className="muted" style={{ fontSize: 12 }}>Opponent positions are estimated from hero roles: {POSITIONS.filter((p) => theirByPos[p]).map((p) => 'Pos ' + p + ' ' + byId[theirByPos[p]].name).join(' · ')}. Lane scores use public head-to-head win rates.</span>}
         </div>
       </div>
 

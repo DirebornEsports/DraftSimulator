@@ -9,7 +9,7 @@ import { STEPS, stepTime } from '@/lib/draft';
 import { overallGrade } from '@/lib/grade';
 import { splitActions, gradeTeam } from '@/lib/replay';
 import { useHeroes, useMatchups } from '@/lib/useHeroes';
-import { addHistory, newId } from '@/lib/store';
+import { addHistory, newId, updateEntry } from '@/lib/store';
 import styles from '../play.module.css';
 
 const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
@@ -32,10 +32,21 @@ export default function RoomPage() {
   const [log, setLog] = useState([]);
   const [savedId, setSavedId] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [positions, setPositions] = useState({});
   const offset = useRef(0);
   const lastV = useRef(0);
 
-  useEffect(() => { setSeat(readSeat(code)); try { setName(localStorage.getItem('dl.name') || ''); } catch {} }, [code]);
+  useEffect(() => {
+    setSeat(readSeat(code));
+    try { setName(localStorage.getItem('dl.name') || ''); setPositions(JSON.parse(localStorage.getItem('dl.pos.' + code)) || {}); } catch {}
+  }, [code]);
+  const setPosition = (heroId, value) => {
+    const next = { ...positions, [heroId]: value };
+    if (!value) delete next[heroId];
+    setPositions(next);
+    try { localStorage.setItem('dl.pos.' + code, JSON.stringify(next)); } catch {}
+    if (savedId) updateEntry(savedId, { positions: next });
+  };
 
   const call = useCallback(async (body) => {
     const r = await fetch('/api/rooms/' + code, {
@@ -101,7 +112,7 @@ export default function RoomPage() {
       id, kind: 'draft', at: Date.now(), tier: g.tier, score: g.score,
       title: 'Multiplayer · ' + cap(room.seats[myTeam].side) + ' ' + (myTeam === 1 ? '1st' : '2nd') + ' pick',
       meta: 'vs ' + (room.seats[other].name || 'opponent') + ' · room ' + code,
-      settings: { mode: room.mode, side: room.seats[myTeam].side }, userTeam: myTeam, picks, bans, log,
+      settings: { mode: room.mode, side: room.seats[myTeam].side }, userTeam: myTeam, picks, bans, log, positions,
     });
     setSavedId(id);
   }, [done, savedId, myTeam, log, room, code, picks, bans]);
@@ -225,9 +236,10 @@ export default function RoomPage() {
         }}
         sel={sel} onSelect={setSel} onLock={lock} canAct={canAct} busy={busy}
         timer={timer} live={room.mode === 'live'} log={log}
+        positions={positions} onPosition={myTeam ? setPosition : undefined}
         doneAction={
           <div style={{ display: 'flex', gap: 10 }}>
-            {myTeam && <button type="button" className="btn btn-ghost" onClick={() => { setSavedId(null); setLog([]); send({ type: 'rematch' }); }}>Rematch</button>}
+            {myTeam && <button type="button" className="btn btn-ghost" onClick={() => { setSavedId(null); setLog([]); setPosition && setPositions({}); try { localStorage.removeItem('dl.pos.' + code); } catch {} send({ type: 'rematch' }); }}>Rematch</button>}
             {savedId && <Link href={'/review?id=' + savedId} className="btn btn-accent">Open full review</Link>}
           </div>
         }

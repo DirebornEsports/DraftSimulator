@@ -134,3 +134,7 @@
 .fbAnim > *:nth-child(4) { animation-delay: .21s; }
 .fbItem { animation: fbIn .4s ease both; }
 .alt { animation: fbIn .45s .25s ease both; }
+
+.posPick { position: absolute; top: 6px; right: 6px; z-index: 2; animation: rise .35s .3s ease both; }
+.posPick select { appearance: none; -webkit-appearance: none; background: rgba(11, 11, 11, .82); color: #ededed; border: 1px solid rgba(255, 255, 255, .25); border-radius: 999px; font-size: 11px; font-weight: 600; padding: 4px 10px; cursor: pointer; backdrop-filter: blur(4px); }
+.posPick select:hover, .posPick select:focus { border-color: #ff3d00; outline: none; }

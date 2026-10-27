@@ -8,7 +8,7 @@ import { STEPS, stepTime, TIMER, loadSettings, saveSettings, userTeamNumber, DEF
 import { aiChoose, overallGrade } from '@/lib/grade';
 import { splitActions, gradeStep } from '@/lib/replay';
 import { useHeroes, useMatchups } from '@/lib/useHeroes';
-import { addHistory, getTeams, newId } from '@/lib/store';
+import { addHistory, getTeams, newId, updateEntry } from '@/lib/store';
 
 const fresh = () => ({ actions: [], log: [], sel: null, left: stepTime(0), reserve: { 1: TIMER.reserve, 2: TIMER.reserve }, savedId: null });
 const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
@@ -20,6 +20,8 @@ export default function DraftPage() {
   const [st, setSt] = useState(fresh);
   const [timerOn, setTimerOn] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [positions, setPositions] = useState({});
+  const posRef = useRef(positions); posRef.current = positions;
   const stRef = useRef(st); stRef.current = st;
   const busyRef = useRef(false);
 
@@ -111,13 +113,19 @@ export default function DraftPage() {
       id, kind: 'draft', at: Date.now(), tier: g.tier, score: g.score,
       title: 'Simulator · ' + (live ? 'Live' : 'Blind') + ' · ' + cap(settings.side) + ' ' + (userTeam === 1 ? '1st' : '2nd') + ' pick',
       meta: 'vs ' + (team ? team.name + ' (team style)' : cap(settings.level) + ' AI'),
-      settings, userTeam, picks: sp.picks, bans: sp.bans, log: st.log,
+      settings, userTeam, picks: sp.picks, bans: sp.bans, log: st.log, positions: posRef.current,
     });
     setSt({ ...stRef.current, savedId: id });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [done]);
 
-  const restart = () => { resetMatchups(); setSt(fresh()); };
+  const restart = () => { resetMatchups(); setSt(fresh()); setPositions({}); };
+  const setPosition = (heroId, value) => {
+    const next = { ...posRef.current, [heroId]: value };
+    if (!value) delete next[heroId];
+    setPositions(next);
+    if (st.savedId) updateEntry(st.savedId, { positions: next });
+  };
   const setMode = (v) => { const n = { ...settings, mode: v }; setSettings(n); saveSettings(n); };
 
   const right = (
@@ -147,6 +155,7 @@ export default function DraftPage() {
               canAct={!!cur && cur.team === userTeam} busy={busy}
               timer={{ left: st.left, reserve: st.reserve }}
               live={live} log={st.log}
+              positions={positions} onPosition={setPosition}
               waitingText="The AI is thinking…"
               doneAction={st.savedId ? <Link href={'/review?id=' + st.savedId} className="btn btn-accent">Open full review</Link> : null}
             />

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Gauge, TierChip, HeroImg } from './ui';
 import { STEPS, phaseOf } from '@/lib/draft';
+import { POSITIONS, POS_SHORT } from '@/lib/positions';
 import styles from './draftboard.module.css';
 
 const ATTRS = [['str', 'Strength'], ['agi', 'Agility'], ['int', 'Intelligence'], ['uni', 'Universal']];
@@ -19,6 +20,7 @@ const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 export default function DraftBoard({
   heroes, byId, picks, bans, step, myTeam, sides, names = {}, badges = {},
   sel, onSelect, onLock, canAct, busy, timer, live, log = [], waitingText, doneAction,
+  positions = {}, onPosition,
 }) {
   const [q, setQ] = useState('');
   const done = step >= STEPS.length;
@@ -54,6 +56,19 @@ export default function DraftBoard({
         return (
           <div key={i} className={styles.slot + (h ? '' : ' ' + styles.slotEmpty)} style={isCurSlot ? { borderColor: 'var(--accent)', borderStyle: 'solid' } : undefined}>
             {h ? <HeroImg hero={h} className={styles.slotImg} /> : <span className={styles.slotNum}>Pick {i + 1}</span>}
+            {h && isMine && onPosition && (
+              <label className={styles.posPick}>
+                <span className="sr-only">Position for {h.name}</span>
+                <select value={positions[hid] || ''} onChange={(e) => onPosition(hid, e.target.value)}>
+                  <option value="">Pos · auto</option>
+                  {POSITIONS.map((p) => {
+                    const takenBy = Object.entries(positions).find(([id, v]) => v === p && Number(id) !== hid);
+                    return <option key={p} value={p} disabled={!!takenBy}>Pos {p} · {POS_SHORT[p]}</option>;
+                  })}
+                  <option value="flex">Flex</option>
+                </select>
+              </label>
+            )}
             {h && (
               <div className={styles.slotInfo}>
                 <span className={styles.slotName}>{h.name}</span>
