@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+import PositionsModal from '@/components/PositionsModal';
 import { Header } from '@/components/ui';
 import DraftBoard from '@/components/DraftBoard';
 import { STEPS, stepTime } from '@/lib/draft';
@@ -35,6 +36,10 @@ export default function RoomPage() {
   const [positions, setPositions] = useState({});
   const offset = useRef(0);
   const savingRef = useRef(false);
+  const saveRef = useRef(null);
+  const router = useRouter();
+  const [showPos, setShowPos] = useState(false);
+  const [posBusy, setPosBusy] = useState(false);
   const lastV = useRef(0);
 
   useEffect(() => {
@@ -110,12 +115,13 @@ export default function RoomPage() {
     const g = overallGrade(log);
     const id = newId();
     const other = myTeam === 1 ? 2 : 1;
-    addHistory({
+    setShowPos(true);
+    saveRef.current = addHistory({
       id, kind: 'draft', at: Date.now(), tier: g.tier, score: g.score, mode: 'multiplayer',
       title: 'Multiplayer · ' + cap(room.seats[myTeam].side) + ' ' + (myTeam === 1 ? '1st' : '2nd') + ' pick',
       meta: 'vs ' + (room.seats[other].name || 'opponent') + ' · room ' + code,
       settings: { mode: room.mode, side: room.seats[myTeam].side }, userTeam: myTeam, picks, bans, log, positions,
-    }).then(() => setSavedId(id)).catch(() => { savingRef.current = false; });
+    }).then(() => { setSavedId(id); return id; }).catch(() => { savingRef.current = false; return null; });
   }, [done, savedId, myTeam, log, room, code, picks, bans]);
 
   const join = async (e) => {
@@ -240,11 +246,26 @@ export default function RoomPage() {
         positions={positions} onPosition={myTeam ? setPosition : undefined}
         doneAction={
           <div style={{ display: 'flex', gap: 10 }}>
-            {myTeam && <button type="button" className="btn btn-ghost" onClick={() => { savingRef.current = false; setSavedId(null); setLog([]); setPosition && setPositions({}); try { localStorage.removeItem('dl.pos.' + code); } catch {} send({ type: 'rematch' }); }}>Rematch</button>}
-            {savedId && <Link href={'/review?id=' + savedId} className="btn btn-accent">Open full review</Link>}
+            {myTeam && <button type="button" className="btn btn-ghost" onClick={() => { savingRef.current = false; saveRef.current = null; setShowPos(false); setSavedId(null); setLog([]); setPosition && setPositions({}); try { localStorage.removeItem('dl.pos.' + code); } catch {} send({ type: 'rematch' }); }}>Rematch</button>}
+            {myTeam && <button type="button" className="btn btn-accent" onClick={() => setShowPos(true)}>Set positions &amp; review</button>}
           </div>
         }
       />
+      {showPos && done && myTeam && (
+        <PositionsModal
+          heroIds={picks[myTeam].filter(Boolean)} byId={byId} initial={positions} busy={posBusy}
+          onClose={() => setShowPos(false)}
+          onConfirm={async (chosen) => {
+            setPosBusy(true);
+            setPositions(chosen);
+            try { localStorage.setItem('dl.pos.' + code, JSON.stringify(chosen)); } catch {}
+            const id = await (saveRef.current || Promise.resolve(savedId));
+            if (!id) { setPosBusy(false); return; }
+            await updateEntry(id, { positions: chosen }).catch(() => {});
+            router.push('/review?id=' + id);
+          }}
+        />
+      )}
     </>,
     <span>{myTeam ? 'Captain · ' + names[myTeam] : 'Spectating'}</span>
   );

@@ -1,6 +1,7 @@
 'use client';
 
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import PositionsModal from '@/components/PositionsModal';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Header, Seg } from '@/components/ui';
 import DraftBoard from '@/components/DraftBoard';
@@ -21,7 +22,11 @@ export default function DraftPage() {
   const [st, setSt] = useState(fresh);
   const [timerOn, setTimerOn] = useState(true);
   const [busy, setBusy] = useState(false);
+  const router = useRouter();
   const [positions, setPositions] = useState({});
+  const [showPos, setShowPos] = useState(false);
+  const [posBusy, setPosBusy] = useState(false);
+  const saveRef = useRef(null);
   const posRef = useRef(positions); posRef.current = positions;
   const stRef = useRef(st); stRef.current = st;
   const busyRef = useRef(false);
@@ -122,16 +127,25 @@ export default function DraftPage() {
     const g = overallGrade(st.log);
     const id = newId();
     const sp = splitActions(st.actions);
-    addHistory({
+    setShowPos(true);
+    saveRef.current = addHistory({
       id, kind: 'draft', at: Date.now(), tier: g.tier, score: g.score, mode: 'simulator', opponentTeam: team ? team.name : null,
       title: 'Simulator · ' + (live ? 'Live' : 'Blind') + ' · ' + cap(settings.side) + ' ' + (userTeam === 1 ? '1st' : '2nd') + ' pick',
       meta: 'vs ' + (team ? team.name + ' (team style)' : cap(settings.level) + ' AI'),
       settings, userTeam, picks: sp.picks, bans: sp.bans, log: st.log, positions: posRef.current,
-    }).then(() => setSt((s) => ({ ...s, savedId: id }))).catch((e) => setSaveErr(e.message));
+    }).then(() => { setSt((s) => ({ ...s, savedId: id })); return id; }).catch((e) => { setSaveErr(e.message); return null; });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [done]);
 
-  const restart = () => { resetMatchups(); setSt(fresh()); setPositions({}); };
+  const restart = () => { resetMatchups(); setSt(fresh()); setPositions({}); setShowPos(false); saveRef.current = null; };
+  const confirmPositions = async (chosen) => {
+    setPosBusy(true);
+    setPositions(chosen);
+    const id = await (saveRef.current || Promise.resolve(st.savedId));
+    if (!id) { setPosBusy(false); return; }
+    await updateEntry(id, { positions: chosen }).catch(() => {});
+    router.push('/review?id=' + id);
+  };
   const setPosition = (heroId, value) => {
     const next = { ...posRef.current, [heroId]: value };
     if (!value) delete next[heroId];
@@ -169,10 +183,17 @@ export default function DraftPage() {
               live={live} log={st.log}
               positions={positions} onPosition={setPosition}
               waitingText="The AI is thinking…"
-              doneAction={st.savedId ? <Link href={'/review?id=' + st.savedId} className="btn btn-accent">Open full review</Link> : <span className="muted" style={{ fontSize: 13 }}>{saveErr ? 'Could not save: ' + saveErr : 'Saving…'}</span>}
+              doneAction={saveErr ? <span className="muted" style={{ fontSize: 13 }}>Could not save: {saveErr}</span> : <button type="button" className="btn btn-accent" onClick={() => setShowPos(true)}>Set positions &amp; review</button>}
             />
           )}
       </main>
+      {showPos && done && (
+        <PositionsModal
+          heroIds={splitActions(st.actions).picks[userTeam].filter(Boolean)} byId={byId}
+          initial={positions} busy={posBusy}
+          onConfirm={confirmPositions} onClose={() => setShowPos(false)}
+        />
+      )}
     </div>
   );
 }
