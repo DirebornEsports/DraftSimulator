@@ -102,7 +102,7 @@ export default function QuizPage() {
   return (
     <Page right={right}>
       <div className={styles.grid}>
-        <aside className={styles.side}>
+        <aside className={'anim-up ' + styles.side}>
           <div className={'panel ' + styles.card}>
             <span className="label">Pro match</span>
             <span className={styles.matchTitle}>{match.radiant} vs {match.dire}</span>
@@ -110,7 +110,7 @@ export default function QuizPage() {
           </div>
           <div className={styles.score}>
             <span className={styles.scoreHead}>Your score</span>
-            <span className={'display ' + styles.scoreNum}>{live || finished ? total : '?'}</span>
+            <span key={total} className={'display anim-pop ' + styles.scoreNum}>{live || finished ? total : '?'}</span>
             <span style={{ fontSize: 13 }}>of {answers.length * 100} possible so far</span>
             <div className={styles.dots}>
               {pickSteps.map((_, i) => {
@@ -129,7 +129,7 @@ export default function QuizPage() {
         </aside>
 
         <section className={styles.mainCol}>
-          <div className={'panel ' + styles.sofar}>
+          <div className={'panel anim-up ' + styles.sofar} style={{ '--d': '80ms' }}>
             <span className="label">Draft so far · {stepIdx} of 24 actions</span>
             {[0, 1].map((t) => (
               <div key={t} className={styles.teamRow}>
@@ -149,7 +149,7 @@ export default function QuizPage() {
           </div>
 
           {!finished && question && (
-            <div className={'panel ' + styles.question}>
+            <div key={question.step.i} className={'panel anim-up ' + styles.question} style={{ '--d': '140ms' }}>
               <div className={styles.qHead}>
                 <span className={styles.qTag}>Step {question.step.i + 1} · {teamName(question.step.team)} pick</span>
                 <h1 className={styles.h1}>What did {teamName(question.step.team)} pick here?</h1>
@@ -172,8 +172,8 @@ export default function QuizPage() {
                 })}
               </div>
               {revealed && (
-                <div className={styles.reveal}>
-                  <div className={styles.pts}><span className="muted" style={{ fontSize: 12 }}>This answer</span><span className={'display ' + styles.ptsNum}>+{current.pts}</span></div>
+                <div className={'anim-up ' + styles.reveal}>
+                  <div className={styles.pts}><span className="muted" style={{ fontSize: 12 }}>This answer</span><span className={'display anim-pop ' + styles.ptsNum}>+{current.pts}</span></div>
                   <span className={styles.explain}>
                     {current.pts === 100
                       ? 'Correct. ' + byId[current.correct].name + ' was the pro pick.'

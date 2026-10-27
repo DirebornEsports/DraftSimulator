@@ -51,7 +51,7 @@ export default function TeamsPage() {
           )}
           <div className={styles.cards}>
             {teams.map((t, ti) => (
-              <article key={t.id} className={styles.card}>
+              <article key={t.id} className={'anim-up ' + styles.card} style={{ '--d': (ti * 80) + 'ms' }}>
                 <div className={'notch-sm ' + styles.top + (ti === 0 ? ' ' + styles.topOrange : '')}>
                   <span className={styles.region}>{t.region}</span>
                   <span className={'display ' + styles.teamName}>{t.name}</span>
@@ -68,7 +68,7 @@ export default function TeamsPage() {
                       </label>
                       <div className={styles.heroes}>
                         {p.heroes.map((hid) => byId[hid] && (
-                          <button key={hid} type="button" className={styles.heroChip} title={'Remove ' + byId[hid].name} onClick={() => toggleHero(t.id, i, hid)}>
+                          <button key={hid} type="button" className={'anim-pop ' + styles.heroChip} title={'Remove ' + byId[hid].name} onClick={() => toggleHero(t.id, i, hid)}>
                             <HeroImg hero={byId[hid]} />
                           </button>
                         ))}
@@ -85,7 +85,7 @@ export default function TeamsPage() {
           </div>
         </section>
 
-        <aside className={'panel ' + styles.form}>
+        <aside className={'panel anim-up ' + styles.form} style={{ '--d': '120ms' }}>
           <h2 className={styles.h2}>Add a team</h2>
           <div className={styles.formTwo}>
             <label className="field">Team name<input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Team name" /></label>
@@ -114,7 +114,7 @@ export default function TeamsPage() {
 
       {picker && pickerPlayer && (
         <div className={styles.overlay} role="dialog" aria-modal="true" aria-label={'Preferred heroes for ' + pickerPlayer.ign} onClick={(e) => e.target === e.currentTarget && setPicker(null)}>
-          <div className={styles.dialog}>
+          <div className={'anim-pop ' + styles.dialog}>
             <div className={styles.dialogHead}>
               <span className={styles.h2}>Preferred heroes · {pickerPlayer.ign}</span>
               <button type="button" className="btn btn-accent" onClick={() => setPicker(null)}>Done</button>

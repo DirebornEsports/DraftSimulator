@@ -82,7 +82,7 @@ function Review() {
       </div>
 
       <div className={styles.topGrid}>
-        <div className={'notch ' + styles.overall}>
+        <div className={'notch anim-up ' + styles.overall}>
           <span className={styles.overallHead}>Overall draft</span>
           <Gauge score={g.score} tier={g.tier} sub={g.score + ' / 100'} size={180} onOrange />
           <div className={styles.stats}>
@@ -92,18 +92,18 @@ function Review() {
           </div>
         </div>
 
-        <div className={'panel ' + styles.phases}>
+        <div className={'panel anim-up ' + styles.phases} style={{ '--d': '80ms' }}>
           <span className="label">By phase</span>
           {phases.map((p) => (
             <div key={p.name} className={styles.phaseRow}><span>{p.name}</span>{p.tier ? <TierChip tier={p.tier} size={28} /> : <span className="muted">—</span>}</div>
           ))}
         </div>
 
-        <div className={'panel ' + styles.chart}>
+        <div className={'panel anim-up ' + styles.chart} style={{ '--d': '160ms' }}>
           <div className={styles.row}><span className="label">Score per action</span><span className="muted" style={{ fontSize: 12 }}>dashed line = B grade</span></div>
           <svg viewBox={'-12 -4 ' + (W + 24) + ' ' + (H + 34)} className={styles.svg} role="img" aria-label={'Score for each of your ' + log.length + ' actions'}>
             <line x1="0" y1={yB} x2={W} y2={yB} stroke="#3a3a3a" strokeDasharray="4 6" />
-            <polyline points={pts.map((p) => p.x + ',' + p.y).join(' ')} fill="none" stroke="#ff3d00" strokeWidth="3" strokeLinejoin="round" style={{ filter: 'drop-shadow(0 0 8px rgba(255,61,0,.7))' }} />
+            <polyline className={styles.line} pathLength="1000" points={pts.map((p) => p.x + ',' + p.y).join(' ')} fill="none" stroke="#ff3d00" strokeWidth="3" strokeLinejoin="round" style={{ filter: 'drop-shadow(0 0 8px rgba(255,61,0,.7))' }} />
             {pts.map((p, i) => (
               <g key={i}>
                 <circle cx={p.x} cy={p.y} r="4.5" fill="#0b0b0b" stroke={worst.includes(p.l) ? '#ededed' : '#ff3d00'} strokeWidth="2" />
@@ -115,13 +115,13 @@ function Review() {
       </div>
 
       <div className={styles.bottom}>
-        <div className={'panel ' + styles.tableWrap}>
+        <div className={'panel anim-up ' + styles.tableWrap} style={{ '--d': '220ms' }}>
           <table className={styles.table}>
             <caption className="label">Step by step</caption>
             <thead><tr><th>Step</th><th>Your action</th><th>Grade</th><th>Best alternative</th><th>Main reason</th></tr></thead>
             <tbody>
-              {log.map((l) => (
-                <tr key={l.step}>
+              {log.map((l, idx) => (
+                <tr key={l.step} style={{ '--i': idx }}>
                   <td className="muted">{l.step + 1}</td>
                   <td>
                     <span className={styles.heroCell}>
@@ -142,7 +142,7 @@ function Review() {
           </table>
         </div>
 
-        <div className={styles.side}>
+        <div className={'anim-up ' + styles.side} style={{ '--d': '280ms' }}>
           <span className="label">Key moments</span>
           {worst.map((l) => (
             <div key={'w' + l.step} className={'panel ' + styles.moment}>

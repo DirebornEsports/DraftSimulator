@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export function Header({ right }) {
   const path = usePathname();
@@ -32,16 +33,18 @@ export function TierChip({ tier, size = 30 }) {
 const TICKS = Array(45).fill('1.2 4.8').join(' ') + ' 0 90';
 
 export function Gauge({ score = 0, tier = '–', sub, size = 190, onOrange = false }) {
-  const arc = Math.round(270 * Math.max(0, Math.min(100, score)) / 100);
+  const target = Math.round(270 * Math.max(0, Math.min(100, score)) / 100);
+  const [arc, setArc] = useState(0);
+  useEffect(() => { const id = requestAnimationFrame(() => setArc(target)); return () => cancelAnimationFrame(id); }, [target]);
   return (
     <div className="gauge" style={{ width: size, height: size }}>
       <svg width={size} height={size} viewBox="0 0 200 200" aria-hidden="true">
         <circle cx="100" cy="100" r="88" fill="none" stroke={onOrange ? 'rgba(11,11,11,.35)' : '#3a3a3a'} strokeWidth="8" pathLength="360" strokeDasharray={TICKS} transform="rotate(135 100 100)" />
         <circle cx="100" cy="100" r="72" fill="none" stroke={onOrange ? 'rgba(11,11,11,.18)' : '#242424'} strokeWidth="6" pathLength="360" strokeDasharray="270 360" strokeLinecap="round" transform="rotate(135 100 100)" />
-        <circle className={onOrange ? '' : 'glow'} cx="100" cy="100" r="72" fill="none" stroke={onOrange ? '#0b0b0b' : 'var(--accent)'} strokeWidth="6" pathLength="360" strokeDasharray={arc + ' 360'} strokeLinecap="round" transform="rotate(135 100 100)" />
+        <circle className={'gauge-arc' + (onOrange ? '' : ' glow')} cx="100" cy="100" r="72" fill="none" stroke={onOrange ? '#0b0b0b' : 'var(--accent)'} strokeWidth="6" pathLength="360" strokeDasharray={arc + ' 360'} strokeLinecap="round" transform="rotate(135 100 100)" />
       </svg>
       <div className="gauge-c">
-        <span className="gauge-t">{tier}</span>
+        <span key={tier + score} className="gauge-t">{tier}</span>
         {sub && <span className="gauge-s">{sub}</span>}
       </div>
     </div>

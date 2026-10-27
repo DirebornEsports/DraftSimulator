@@ -30,11 +30,22 @@
 .qTag { font-size: 12px; color: var(--accent-soft); letter-spacing: .1em; text-transform: uppercase; }
 .h1 { margin: 0; font-size: 30px; font-weight: 300; }
 .options { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+@keyframes optIn { from { opacity: 0; transform: translateY(12px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes rightFlash { 0% { box-shadow: 0 0 0 0 rgba(255, 61, 0, .8); transform: scale(1); } 40% { transform: scale(1.04); } 100% { box-shadow: 0 0 0 14px rgba(255, 61, 0, 0); transform: scale(1); } }
+@keyframes shake { 0%, 100% { transform: none; } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+.opt { animation: optIn .45s cubic-bezier(.2, .7, .2, 1) both; transition: transform .15s ease, border-color .2s ease, background-color .25s ease, color .25s ease; }
+.opt:nth-child(2) { animation-delay: .06s; } .opt:nth-child(3) { animation-delay: .12s; } .opt:nth-child(4) { animation-delay: .18s; }
+.opt:not(:disabled):hover { transform: translateY(-3px); }
+.opt img { transition: transform .3s ease; }
+.opt:not(:disabled):hover img { transform: scale(1.06); }
+.dot { transition: background-color .3s ease; }
 .opt { position: relative; text-align: left; padding: 0; border-radius: 16px; overflow: hidden; background: #0e0e0e; border: 1px solid #2a2a2a; color: var(--text); display: flex; flex-direction: column; }
 .opt img { border-radius: 0; }
 .opt:not(:disabled):hover { border-color: var(--accent); }
 .optName { padding: 12px 14px; font-size: 16px; font-weight: 500; }
 .optTier { position: absolute; top: 8px; right: 8px; }
+.optRight { animation: rightFlash .8s ease-out both; }
+.optWrong { animation: shake .35s ease both; }
 .optRight { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
 .optWrong { border-color: #ededed; }
 .optChosen { border-color: var(--accent); background: #2a130b; }

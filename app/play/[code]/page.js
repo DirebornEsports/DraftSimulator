@@ -182,10 +182,10 @@ export default function RoomPage() {
             const s = room.seats[t];
             const mine = myTeam === t;
             return (
-              <div key={t} className={styles.seat + (mine ? ' ' + styles.seatMine : '')}>
+              <div key={t} className={'anim-up ' + styles.seat + (mine ? ' ' + styles.seatMine : '')} style={{ '--d': (t * 90) + 'ms' }}>
                 <span className={styles.seatMeta}>{cap(s.side)} · {t === 1 ? 'First pick' : 'Second pick'}{mine ? ' · You' : ''}</span>
-                <span className={styles.seatName}>{s.joined ? s.name : 'Waiting for captain…'}</span>
-                {s.joined && <span className={styles.readyTag}>{s.ready ? 'Ready' : 'Not ready'}</span>}
+                <span key={s.joined ? 'j' : 'w'} className={'anim-fade ' + styles.seatName + (s.joined ? '' : ' ' + styles.waiting)}>{s.joined ? s.name : 'Waiting for captain…'}</span>
+                {s.joined && <span key={String(s.ready)} className={'anim-pop ' + styles.readyTag + (s.ready ? ' ' + styles.readyOn : '')}>{s.ready ? 'Ready' : 'Not ready'}</span>}
                 {mine && (
                   <button type="button" className={'btn ' + (s.ready ? 'btn-ghost' : 'btn-light')} style={{ alignSelf: 'flex-start', color: s.ready ? 'var(--accent-ink)' : undefined, borderColor: 'var(--accent-ink)' }} disabled={busy} onClick={() => send({ type: 'ready', ready: !s.ready })}>
                     {s.ready ? 'Cancel ready' : 'I’m ready'}

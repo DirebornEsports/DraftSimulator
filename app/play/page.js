@@ -41,14 +41,14 @@ export default function PlayLobby() {
     <div className="page">
       <Header right={<span>Captain vs captain, in real time</span>} />
       <main className={'wrap ' + styles.grid}>
-        <section className={'notch ' + styles.hero}>
+        <section className={'notch anim-up ' + styles.hero}>
           <span className={styles.heroTop}>Multiplayer draft</span>
           <p className={styles.heroCopy}>Two captains, one Captain&rsquo;s Mode draft. Share the room code — teammates and coaches can watch as spectators. Each captain gets their own S–F grades.</p>
-          <div className={'display ' + styles.word}>1v1<br />draft</div>
+          <div className={'display anim-word ' + styles.word}>1v1<br />draft</div>
         </section>
 
         <section className={styles.col}>
-          <div className={'panel ' + styles.card}>
+          <div className={'panel anim-up ' + styles.card} style={{ '--d': '80ms' }}>
             <h1 className={styles.h1}>Create a room</h1>
             <label className="field">Your name<input value={name} onChange={(e) => setName(e.target.value)} placeholder="Captain name" maxLength={24} /></label>
             <div className={styles.two}>
@@ -59,7 +59,7 @@ export default function PlayLobby() {
             <button type="button" className="btn btn-accent" disabled={busy} onClick={create}>{busy ? 'Creating…' : 'Create room'}</button>
           </div>
 
-          <form className={'panel ' + styles.card} onSubmit={join}>
+          <form className={'panel anim-up ' + styles.card} style={{ '--d': '160ms' }} onSubmit={join}>
             <h2 className={styles.h2}>Join with a code</h2>
             <div className={styles.joinRow}>
               <label className="field" style={{ flex: 1 }}><span className="sr-only">Room code</span>

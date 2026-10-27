@@ -88,7 +88,7 @@ export default function DraftBoard({
         </div>
         {timer && !done && (
           <div className={styles.timers}>
-            <div className={styles.timeBox}><span className="label">Step time</span><span className={'display ' + styles.time}>{fmt(timer.left)}</span></div>
+            <div className={styles.timeBox}><span className="label">Step time</span><span className={'display ' + styles.time}><span className={timer.left <= 10 && timer.left > 0 && !(timer.countdown > 0) ? styles.timeLow : ''}>{fmt(timer.left)}</span></span></div>
             <div className={styles.reserve}><span className="muted">{teamLabel(leftTeam)} reserve</span><span>{fmt(timer.reserve[leftTeam])}</span></div>
             <div className={styles.reserve}><span className="muted">{teamLabel(rightTeam)} reserve</span><span>{fmt(timer.reserve[rightTeam])}</span></div>
           </div>
@@ -101,7 +101,7 @@ export default function DraftBoard({
           const cls = [styles.cell, c.mine ? styles.cellMine : styles.cellAi, c.isCur ? styles.cellCur : '', c.type === 'ban' ? styles.cellBan : ''].join(' ');
           return (
             <li key={c.i} className={cls} title={teamLabel(c.team) + ' · ' + c.type + ' ' + c.n + (h ? ' · ' + h.name : '')}>
-              {h ? <HeroImg hero={h} className={styles.cellImg} /> : <span className={styles.cellTag}>{c.type === 'pick' ? 'P' : 'B'}{c.n}</span>}
+              {h ? <HeroImg key={h.id} hero={h} className={styles.cellImg} /> : <span className={styles.cellTag}>{c.type === 'pick' ? 'P' : 'B'}{c.n}</span>}
             </li>
           );
         })}
@@ -162,7 +162,7 @@ export default function DraftBoard({
       </div>
 
       {myTeam && (live ? (
-        <div className={styles.feedback}>
+        <div key={log.length} className={styles.feedback + ' ' + styles.fbAnim}>
           <div className={'panel ' + styles.fbGauge}>
             <span className={'label ' + styles.fbHead}>{last ? (last.type === 'pick' ? 'Your last pick' : 'Your last ban') : 'Waiting for your first action'}</span>
             <Gauge score={last ? last.score : 0} tier={last ? last.tier : '–'} sub={last ? last.score + ' / 100' : 'no action yet'} size={180} />

@@ -99,3 +99,38 @@
 
 .boardWrap { display: flex; flex-direction: column; gap: 16px; }
 .countdown { font-family: var(--font-display); color: var(--accent-soft); }
+
+/* ---------- Motion ---------- */
+@keyframes slotIn { 0% { opacity: 0; transform: scale(1.25); filter: brightness(2.2) saturate(0); } 60% { opacity: 1; filter: brightness(1.3); } 100% { transform: scale(1); filter: none; } }
+@keyframes slotFlash { 0% { box-shadow: inset 0 0 0 2px #ff3d00, 0 0 26px rgba(255, 61, 0, .7); } 100% { box-shadow: inset 0 0 0 0 transparent, 0 0 0 transparent; } }
+@keyframes strike { from { transform: rotate(-22deg) scaleX(0); } to { transform: rotate(-22deg) scaleX(1); } }
+@keyframes banIn { from { opacity: 0; transform: scale(1.3); } to { opacity: 1; transform: none; } }
+@keyframes curPulse { 0%, 100% { box-shadow: 0 0 10px rgba(255, 61, 0, .35); } 50% { box-shadow: 0 0 22px rgba(255, 61, 0, .8); } }
+@keyframes cellIn { from { opacity: 0; transform: translateY(-6px) scale(1.2); } to { opacity: 1; transform: none; } }
+@keyframes timeLow { 0%, 100% { color: #ff6a3d; transform: scale(1); } 50% { color: #ffd0c0; transform: scale(1.08); } }
+@keyframes fbIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes selRing { 0%, 100% { box-shadow: 0 0 0 1px #ff3d00, 0 0 14px rgba(255, 61, 0, .45); } 50% { box-shadow: 0 0 0 2px #ff3d00, 0 0 26px rgba(255, 61, 0, .75); } }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+.boardWrap > * { animation: rise .55s cubic-bezier(.2, .7, .2, 1) both; }
+.boardWrap > *:nth-child(2) { animation-delay: .06s; }
+.boardWrap > *:nth-child(3) { animation-delay: .12s; }
+.boardWrap > *:nth-child(4) { animation-delay: .18s; }
+
+.slot:not(.slotEmpty) { animation: slotFlash 1s ease-out both; }
+.slotImg { animation: slotIn .6s cubic-bezier(.2, .7, .2, 1) both; }
+.slotInfo { animation: rise .45s .2s ease both; }
+.slotEmpty { transition: border-color .3s ease; }
+.ban:not(.banEmpty) img { animation: banIn .35s ease both; }
+.ban::after { transform-origin: left center; animation: strike .35s .15s cubic-bezier(.2, .7, .2, 1) both; }
+.cellCur { animation: curPulse 1.4s ease-in-out infinite; }
+.cellImg { animation: cellIn .4s cubic-bezier(.2, .8, .3, 1.2) both; }
+.tile { transition: transform .12s ease, opacity .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.sel { animation: selRing 1.2s ease-in-out infinite; }
+.timeLow { animation: timeLow .8s ease-in-out infinite; display: inline-block; }
+.fbAnim > * { animation: fbIn .5s cubic-bezier(.2, .7, .2, 1) both; }
+.fbAnim > *:nth-child(2) { animation-delay: .07s; }
+.fbAnim > *:nth-child(3) { animation-delay: .14s; }
+.fbAnim > *:nth-child(4) { animation-delay: .21s; }
+.fbItem { animation: fbIn .4s ease both; }
+.alt { animation: fbIn .45s .25s ease both; }

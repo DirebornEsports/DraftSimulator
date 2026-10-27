@@ -15,7 +15,7 @@ export default function HistoryPage() {
       <main className="wrap" style={{ maxWidth: 900 }}>
         <h1 style={{ margin: '0 0 20px', fontSize: 40, fontWeight: 300 }}>History</h1>
         {items && items.length === 0 && <div className="panel center-note">No drafts or quizzes yet. <Link href="/draft">Start a draft</Link>.</div>}
-        <div className="panel" style={{ padding: '6px 24px' }}>
+        <div className="panel anim-up" style={{ padding: '6px 24px' }}>
           {(items || []).map((h) => {
             const row = (
               <>

@@ -6,7 +6,8 @@
 .wordmark { font-weight: 800; font-size: clamp(64px, 9vw, 118px); line-height: .85; letter-spacing: -.05em; margin-left: -6px; }
 .modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .mode { text-decoration: none; color: var(--text); background: #151515; border: 1px solid #232323; border-radius: 22px; padding: 24px; display: flex; flex-direction: column; gap: 12px; min-height: 150px; font-size: 14px; line-height: 1.45; }
-.mode:hover { border-color: #4a2416; }
+.mode { transition: transform .2s ease, border-color .2s ease, background-color .2s ease; }
+.mode:hover { border-color: #ff3d00; transform: translateY(-3px); background: #1a120f; }
 .modeTitle { font-size: 21px; font-weight: 500; }
 .setup { padding: 28px; display: flex; flex-direction: column; gap: 22px; }
 .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
@@ -14,6 +15,9 @@
 .block { display: flex; flex-direction: column; gap: 10px; }
 .two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
 .modeCards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.card, .cardOn { transition: background-color .25s ease, border-color .25s ease, transform .15s ease; }
+.card:hover { border-color: #4a2416; }
+.card:active, .cardOn:active { transform: scale(.98); }
 .card, .cardOn { text-align: left; border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; }
 .card { background: #0e0e0e; color: var(--text); border: 1px solid #2a2a2a; }
 .cardOn { background: var(--accent); color: var(--accent-ink); border: 1px solid var(--accent); }
@@ -21,6 +25,8 @@
 .cardDesc { font-size: 13px; line-height: 1.4; opacity: .85; }
 .footer { display: flex; justify-content: space-between; align-items: center; gap: 16px; border-top: 1px solid #222; padding-top: 18px; flex-wrap: wrap; }
 .recent { padding: 22px 28px; display: flex; flex-direction: column; gap: 10px; }
+.recentRow { transition: background-color .2s ease, padding-left .2s ease; }
+.recentRow:hover { background: #181818; padding-left: 6px; }
 .recentRow { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 14px; align-items: center; text-decoration: none; color: var(--text); padding: 8px 0; border-bottom: 1px solid #1d1d1d; }
 .recentText { display: flex; flex-direction: column; gap: 2px; font-size: 15px; }
 

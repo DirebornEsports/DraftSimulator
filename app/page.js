@@ -26,12 +26,12 @@ export default function Home() {
       <Header right={<span>Live data from OpenDota</span>} />
       <main className={'wrap ' + styles.grid}>
         <section className={styles.left}>
-          <div className={'notch ' + styles.hero}>
+          <div className={'notch anim-up ' + styles.hero}>
             <div className={styles.heroTop}><span>Pro-level draft training</span><span>Captain&rsquo;s Mode · default timer</span></div>
             <p className={styles.heroCopy}>Draft against an AI that counter-picks you. Every pick and ban graded S to F — live, or all at once after the draft.</p>
-            <div className={'display ' + styles.wordmark}>draft<br />lab</div>
+            <div className={'display anim-word ' + styles.wordmark}>draft<br />lab</div>
           </div>
-          <div className={styles.modes}>
+          <div className={'anim-up ' + styles.modes} style={{ '--d': '120ms' }}>
             <Link href="/draft" className={styles.mode}>
               <span className="label">Mode 01</span>
               <span className={styles.modeTitle}>Draft Simulator</span>
@@ -51,7 +51,7 @@ export default function Home() {
         </section>
 
         <section className={styles.right}>
-          <div className={'panel ' + styles.setup}>
+          <div className={'panel anim-up ' + styles.setup} style={{ '--d': '80ms' }}>
             <div className={styles.row}><h1 className={styles.h1}>Session setup</h1><span className="muted" style={{ fontSize: 12 }}>applies to Simulator &amp; Quiz</span></div>
 
             <div className={styles.block}>
@@ -94,7 +94,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className={'panel ' + styles.recent}>
+          <div className={'panel anim-up ' + styles.recent} style={{ '--d': '180ms' }}>
             <div className={styles.row}><span className="label">Recent drafts</span><Link href="/history" style={{ fontSize: 13, textDecoration: 'none' }}>See all</Link></div>
             {history.length === 0 && <span className="muted" style={{ fontSize: 14 }}>Your graded drafts and quizzes will show up here.</span>}
             {history.slice(0, 4).map((h) => (
