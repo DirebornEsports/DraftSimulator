@@ -168,7 +168,7 @@ export default function RoomPage() {
     </div>
   );
   const banner = room.persistent === false && (
-    <div className={styles.banner}>Multiplayer storage isn&rsquo;t connected yet, so rooms may reset. Add &ldquo;Upstash for Redis&rdquo; to the Vercel project to fix this.</div>
+    <div className={styles.banner}>Room storage isn&rsquo;t connected, so rooms may reset. In Vercel, connect a Redis database to this project (Storage tab) and redeploy.</div>
   );
 
   // Lobby
