@@ -1,0 +1,29 @@
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; }
+.hero { background: var(--accent); color: var(--accent-ink); border-radius: 28px; min-height: 460px; padding: 40px 44px; display: flex; flex-direction: column; justify-content: space-between; }
+.heroTop { font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+.heroCopy { max-width: 440px; font-size: 17px; line-height: 1.45; font-weight: 500; margin: 0; }
+.word { font-weight: 800; font-size: clamp(64px, 9vw, 112px); line-height: .85; letter-spacing: -.05em; }
+.col { display: flex; flex-direction: column; gap: 20px; }
+.card { padding: 28px; display: flex; flex-direction: column; gap: 18px; }
+.h1 { margin: 0; font-size: 26px; font-weight: 400; }
+.h2 { margin: 0; font-size: 20px; font-weight: 400; }
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.block { display: flex; flex-direction: column; gap: 10px; }
+.joinRow { display: flex; gap: 12px; align-items: flex-end; }
+.codeInput { font-family: var(--font-display); letter-spacing: .2em; text-transform: uppercase; }
+
+/* Room */
+.roomTop { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+.codeWrap { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.seats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.seat { border-radius: 24px; padding: 26px; min-height: 220px; display: flex; flex-direction: column; justify-content: space-between; gap: 16px; background: var(--panel); border: 1px solid var(--line); }
+.seatMine { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.seatName { font-family: var(--font-display); font-size: 34px; font-weight: 700; letter-spacing: -.02em; overflow-wrap: anywhere; }
+.seatMeta { font-size: 13px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
+.readyTag { align-self: flex-start; font-size: 12px; font-weight: 600; border-radius: 999px; padding: 5px 12px; border: 1px solid currentColor; }
+.banner { border: 1px dashed #4a2416; color: var(--accent-soft); border-radius: 14px; padding: 12px 16px; font-size: 14px; margin-bottom: 16px; }
+
+@media (max-width: 1000px) {
+  .grid, .seats, .two { grid-template-columns: 1fr; }
+  .hero { min-height: 320px; padding: 28px; }
+}
