@@ -6,6 +6,9 @@ Dota 2 Captain's Mode draft trainer. Next.js (App Router) on Vercel, data from t
 - **Draft Simulator** — full 24-step Captain's Mode vs an AI (Easy / Hard / Team style).
   - *Live feedback*: S–F grade, pros, risks and better options after every pick and ban.
   - *Blind*: no hints; full graded review at `/review` after the draft.
+- **Ranked draft** (`/ranked`) — quick Ranked All Pick: ban nominations (50% each), picks 1-2-2-2-2-1,
+  pick suggestions for your position (Immortal win rate, counters vs enemy picks, synergy, role fit).
+  Play as one player with AI teammates, or draft the whole team.
 - **Multiplayer** (`/play`) — captain vs captain in a shared room with a 6-character code. Spectators can watch.
   The server runs the turns, timers, reserve time and timeouts; each captain gets their own live or blind grades.
 - **Draft Quiz** — a recent pro match from OpenDota; guess each of the 10 picks (100 exact / 60 strong alternative / 0).

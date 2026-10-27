@@ -41,6 +41,11 @@ export default function Home() {
               <span className={styles.modeTitle}>Draft Simulator</span>
               <span className="muted">Full 24-step Captain&rsquo;s Mode vs an AI opponent.</span>
             </Link>
+            <Link href="/ranked" className={styles.mode}>
+              <span className="label">Quick</span>
+              <span className={styles.modeTitle}>Ranked draft</span>
+              <span className="muted">All Pick with ban nominations and pick suggestions for your role.</span>
+            </Link>
             <Link href="/play" className={styles.mode}>
               <span className="label">Mode 02</span>
               <span className={styles.modeTitle}>Multiplayer</span>

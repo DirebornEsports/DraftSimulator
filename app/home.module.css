@@ -4,7 +4,7 @@
 .heroTop { display: flex; justify-content: space-between; gap: 16px; font-size: 13px; font-weight: 500; padding-right: 110px; }
 .heroCopy { max-width: 430px; font-size: 17px; line-height: 1.45; font-weight: 500; margin: 0; }
 .wordmark { font-weight: 800; font-size: clamp(64px, 9vw, 118px); line-height: .85; letter-spacing: -.05em; margin-left: -6px; }
-.modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.modes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .mode { text-decoration: none; color: var(--text); background: #151515; border: 1px solid #232323; border-radius: 22px; padding: 24px; display: flex; flex-direction: column; gap: 12px; min-height: 150px; font-size: 14px; line-height: 1.45; }
 .mode { transition: transform .2s ease, border-color .2s ease, background-color .2s ease; }
 .mode:hover { border-color: #ff3d00; transform: translateY(-3px); background: #1a120f; }

@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 export function Header({ right }) {
   const path = usePathname();
   const nav = [
-    ['/', 'Home'], ['/draft', 'Simulator'], ['/play', 'Multiplayer'], ['/quiz', 'Quiz'], ['/teams', 'Teams'], ['/history', 'History'],
+    ['/', 'Home'], ['/draft', 'Simulator'], ['/ranked', 'Ranked'], ['/play', 'Multiplayer'], ['/quiz', 'Quiz'], ['/teams', 'Teams'], ['/history', 'History'],
   ];
   return (
     <header className="hdr">
