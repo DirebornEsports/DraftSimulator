@@ -37,9 +37,9 @@ function Review() {
 
   useEffect(() => {
     const id = params.get('id');
-    const e = id ? getEntry(id) : getHistory().find((x) => x.kind === 'draft');
-    setEntry(e || null);
-    setChosen((e && e.positions) || {});
+    (id ? getEntry(id) : getHistory().then((h) => h.find((x) => x.kind === 'draft')))
+      .then((e) => { setEntry(e || null); setChosen((e && e.positions) || {}); })
+      .catch(() => setEntry(null));
   }, [params]);
 
   useEffect(() => {
@@ -51,7 +51,7 @@ function Review() {
     const next = { ...chosen, [heroId]: value };
     if (!value) delete next[heroId];
     setChosen(next);
-    if (entry) updateEntry(entry.id, { positions: next });
+    if (entry) updateEntry(entry.id, { positions: next }).catch(() => {});
   };
 
   if (entry === undefined || loading) return <Frame><div className="center-note">Loading review…</div></Frame>;

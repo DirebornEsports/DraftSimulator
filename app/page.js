@@ -10,7 +10,7 @@ import styles from './home.module.css';
 const LEVEL_DESC = {
   easy: 'Picks strong meta heroes and ignores your draft.',
   hard: 'Counter-drafts you using matchup data and fills its own roles.',
-  team: 'Drafts like a saved team: favours its players’ preferred heroes.',
+  team: 'Role-plays a saved team: copies its real pick and ban habits from imported matches, plus its players’ hero pools.',
 };
 
 export default function Home() {
@@ -18,7 +18,11 @@ export default function Home() {
   const [teams, setTeams] = useState([]);
   const [history, setHistory] = useState([]);
 
-  useEffect(() => { setS(loadSettings()); setTeams(getTeams()); setHistory(getHistory()); }, []);
+  useEffect(() => {
+    setS(loadSettings());
+    getTeams().then(setTeams).catch(() => {});
+    getHistory().then(setHistory).catch(() => {});
+  }, []);
   const set = (patch) => { const n = { ...s, ...patch }; setS(n); saveSettings(n); };
 
   return (
@@ -81,7 +85,7 @@ export default function Home() {
                   <label className="field">Team to imitate
                     <select value={s.teamId || ''} onChange={(e) => set({ teamId: e.target.value || null })}>
                       <option value="">Choose a team</option>
-                      {teams.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+                      {teams.map((t) => <option key={t.id} value={t.id}>{t.name}{t.matches?.length ? ' · ' + t.matches.filter((m) => m.side).length + ' matches' : ' · no matches yet'}</option>)}
                     </select>
                   </label>
                 ) : <span style={{ fontSize: 13 }}>No teams saved yet. <Link href="/teams">Add one</Link>.</span>

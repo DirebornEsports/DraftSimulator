@@ -81,7 +81,7 @@ export default function QuizPage() {
   useEffect(() => {
     if (!finished || saved || !match) return;
     const score = Math.round(total / pickSteps.length);
-    addHistory({ id: newId(), kind: 'quiz', at: Date.now(), tier: tierOf(score), score, title: 'Quiz · ' + match.radiant + ' vs ' + match.dire, meta: answers.filter((a) => a.pts === 100).length + ' exact, ' + answers.filter((a) => a.pts === 60).length + ' close of ' + pickSteps.length });
+    addHistory({ id: newId(), kind: 'quiz', mode: 'quiz', at: Date.now(), tier: tierOf(score), score, title: 'Quiz · ' + match.radiant + ' vs ' + match.dire, meta: answers.filter((a) => a.pts === 100).length + ' exact, ' + answers.filter((a) => a.pts === 60).length + ' close of ' + pickSteps.length }).catch(() => {});
     setSaved(true);
   }, [finished, saved, match, total, pickSteps.length, answers]);
 

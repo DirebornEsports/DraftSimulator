@@ -6,6 +6,7 @@ import { Header, Seg } from '@/components/ui';
 import DraftBoard from '@/components/DraftBoard';
 import { STEPS, stepTime, TIMER, loadSettings, saveSettings, userTeamNumber, DEFAULT_SETTINGS } from '@/lib/draft';
 import { aiChoose, overallGrade } from '@/lib/grade';
+import { buildProfile, tendency } from '@/lib/profile';
 import { splitActions, gradeStep } from '@/lib/replay';
 import { useHeroes, useMatchups } from '@/lib/useHeroes';
 import { addHistory, getTeams, newId, updateEntry } from '@/lib/store';
@@ -36,11 +37,17 @@ export default function DraftPage() {
   const cur = done ? null : STEPS[step];
   const { picks, bans } = useMemo(() => splitActions(st.actions), [st.actions]);
 
+  const [teams, setTeams] = useState([]);
+  const [teamsLoaded, setTeamsLoaded] = useState(false);
+  useEffect(() => { getTeams().then(setTeams).catch(() => {}).finally(() => setTeamsLoaded(true)); }, []);
   const team = useMemo(() => {
     if (settings.level !== 'team' || !settings.teamId) return null;
-    return getTeams().find((x) => x.id === settings.teamId) || null;
+    return teams.find((x) => x.id === settings.teamId) || null;
   }, [settings]);
   const preferred = team ? team.players.flatMap((p) => p.heroes || []) : [];
+  const profile = useMemo(() => (team ? buildProfile(team) : null), [team]);
+  const profileRef = useRef(null); profileRef.current = { profile, preferred };
+  const [saveErr, setSaveErr] = useState(null);
 
   const pushAction = (s, heroId, entry) => {
     const actions = [...s.actions, heroId];
@@ -65,6 +72,7 @@ export default function DraftPage() {
   // AI turn.
   useEffect(() => {
     if (loading || error || done || !cur || cur.team !== aiTeam) return;
+    if (settings.level === 'team' && settings.teamId && !teamsLoaded) return;
     let cancelled = false;
     (async () => {
       const s = stRef.current;
@@ -73,13 +81,18 @@ export default function DraftPage() {
       await new Promise((r) => setTimeout(r, 650));
       if (cancelled || stRef.current.actions.length !== s.actions.length) return;
       const used = new Set(s.actions.filter(Boolean));
-      const choice = aiChoose({ level: settings.level, type: cur.type, aiPicks: sp.picks[aiTeam].filter(Boolean), userPicks: sp.picks[userTeam].filter(Boolean), byId, matchups: m, used, preferred });
+      const nth = (cur.type === 'pick' ? sp.picks[aiTeam] : sp.bans[aiTeam]).length + 1;
+      const choice = aiChoose({
+        level: settings.level, type: cur.type, aiPicks: sp.picks[aiTeam].filter(Boolean), userPicks: sp.picks[userTeam].filter(Boolean),
+        byId, matchups: m, used, preferred: profileRef.current.preferred,
+        profile: profileRef.current.profile, order: aiTeam === 1 ? 'F' : 'S', nth, tendencyFn: tendency,
+      });
       setSt(pushAction(stRef.current, choice, null));
       if (cur.type === 'pick' && choice) ensure([choice]);
     })();
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step, loading, error, aiTeam]);
+  }, [step, loading, error, aiTeam, teamsLoaded]);
 
   // Timer: per-step time, then reserve; a ban that runs out is lost, a pick is randomed.
   useEffect(() => {
@@ -110,12 +123,11 @@ export default function DraftPage() {
     const id = newId();
     const sp = splitActions(st.actions);
     addHistory({
-      id, kind: 'draft', at: Date.now(), tier: g.tier, score: g.score,
+      id, kind: 'draft', at: Date.now(), tier: g.tier, score: g.score, mode: 'simulator', opponentTeam: team ? team.name : null,
       title: 'Simulator · ' + (live ? 'Live' : 'Blind') + ' · ' + cap(settings.side) + ' ' + (userTeam === 1 ? '1st' : '2nd') + ' pick',
       meta: 'vs ' + (team ? team.name + ' (team style)' : cap(settings.level) + ' AI'),
       settings, userTeam, picks: sp.picks, bans: sp.bans, log: st.log, positions: posRef.current,
-    });
-    setSt({ ...stRef.current, savedId: id });
+    }).then(() => setSt((s) => ({ ...s, savedId: id }))).catch((e) => setSaveErr(e.message));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [done]);
 
@@ -124,7 +136,7 @@ export default function DraftPage() {
     const next = { ...posRef.current, [heroId]: value };
     if (!value) delete next[heroId];
     setPositions(next);
-    if (st.savedId) updateEntry(st.savedId, { positions: next });
+    if (st.savedId) updateEntry(st.savedId, { positions: next }).catch(() => {});
   };
   const setMode = (v) => { const n = { ...settings, mode: v }; setSettings(n); saveSettings(n); };
 
@@ -149,7 +161,7 @@ export default function DraftPage() {
               names={{ [aiTeam]: team ? team.name : undefined }}
               badges={{
                 [userTeam]: <span className="pill-accent">YOU · {userTeam === 1 ? '1ST' : '2ND'}</span>,
-                [aiTeam]: <span className="pill-ghost">{team ? 'TEAM STYLE' : 'AI · ' + settings.level.toUpperCase()}</span>,
+                [aiTeam]: <span className="pill-ghost">{team ? (profile && profile.n ? 'AI · ' + profile.n + ' MATCHES' : 'TEAM STYLE') : 'AI · ' + settings.level.toUpperCase()}</span>,
               }}
               sel={st.sel} onSelect={(id) => setSt({ ...stRef.current, sel: id })} onLock={(id) => lockIn(id)}
               canAct={!!cur && cur.team === userTeam} busy={busy}
@@ -157,7 +169,7 @@ export default function DraftPage() {
               live={live} log={st.log}
               positions={positions} onPosition={setPosition}
               waitingText="The AI is thinking…"
-              doneAction={st.savedId ? <Link href={'/review?id=' + st.savedId} className="btn btn-accent">Open full review</Link> : null}
+              doneAction={st.savedId ? <Link href={'/review?id=' + st.savedId} className="btn btn-accent">Open full review</Link> : <span className="muted" style={{ fontSize: 13 }}>{saveErr ? 'Could not save: ' + saveErr : 'Saving…'}</span>}
             />
           )}
       </main>

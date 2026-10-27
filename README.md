@@ -9,7 +9,9 @@ Dota 2 Captain's Mode draft trainer. Next.js (App Router) on Vercel, data from t
 - **Multiplayer** (`/play`) — captain vs captain in a shared room with a 6-character code. Spectators can watch.
   The server runs the turns, timers, reserve time and timeouts; each captain gets their own live or blind grades.
 - **Draft Quiz** — a recent pro match from OpenDota; guess each of the 10 picks (100 exact / 60 strong alternative / 0).
-- **Teams** — save teams, players, positions and preferred heroes; used by the Team-style AI.
+- **Teams** — shared team database (Redis): players, positions, hero pools, and imported pro matches.
+  Import by match IDs or by OpenDota team ID (recent matches). The team's pick/ban habits per draft slot
+  become an AI profile, so the simulator opponent can role-play that team. Cards show a scouting summary.
 
 ## Data
 | Route | Source | Cache |
@@ -27,10 +29,17 @@ It sets `KV_REST_API_URL` / `KV_REST_API_TOKEN` automatically; redeploy afterwar
 Without it the app falls back to in-memory rooms, which reset between server instances (local dev only).
 Clients poll `/api/rooms/[code]` once a second.
 
+## Storage
+Redis keys: `dl:teams` (all teams, JSON), `dl:history` (latest 400 drafts/quizzes), `dl:room:*` (multiplayer, 24 h).
+API: `/api/teams`, `/api/teams/[id]/import`, `/api/teams/[id]/match`, `/api/history`, `/api/health`.
+Data saved in a browser by older versions is moved to the database on first visit.
+
 ## Grading (lib/grade.js)
 Score = 30 + 0.6 × meta strength + counter value + composition needs, clamped to 0–100.
 - **Meta**: pro contest rate (picks + bans), pro win rate, Immortal-bracket win rate.
 - **Counters**: public matchup win rates vs enemy picks (picks) or vs your picks (bans), min 40 games.
+- **Synergy**: pro-match win rate of hero pairs on the same team (last 120 days, OpenDota explorer, min 8 games).
+  Picks gain for pairing with your heroes; bans gain for breaking the enemy's pairs.
 - **Composition**: support/core balance, carries, initiation, lockdown.
 Tiers: S ≥ 85, A ≥ 75, B ≥ 65, C ≥ 55, D ≥ 45, F below.
 
@@ -46,6 +55,5 @@ Captains set Pos 1–5 or Flex for each picked hero (on the board or in the revi
 - Final grade = 70% picks & bans + 15% positions + 15% lanes.
 
 ## Next steps
-- Move teams and history from browser storage to Postgres (Vercel Marketplace).
 - Scheduled data refresh + hero synergy data.
 - Team-style AI trained on a team's real pro drafts.

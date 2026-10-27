@@ -7,7 +7,7 @@ import { getHistory } from '@/lib/store';
 
 export default function HistoryPage() {
   const [items, setItems] = useState(null);
-  useEffect(() => { setItems(getHistory()); }, []);
+  useEffect(() => { getHistory().then(setItems).catch(() => setItems([])); }, []);
 
   return (
     <div className="page">
@@ -20,7 +20,7 @@ export default function HistoryPage() {
             const row = (
               <>
                 <TierChip tier={h.tier} size={38} />
-                <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}><span>{h.title}</span><span className="muted" style={{ fontSize: 12 }}>{h.meta} · score {h.score}</span></span>
+                <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}><span>{h.title}</span><span className="muted" style={{ fontSize: 12 }}>{h.by ? h.by + ' · ' : ''}{h.meta} · score {h.score}</span></span>
                 <span className="muted" style={{ fontSize: 12 }}>{new Date(h.at).toLocaleString()}</span>
               </>
             );
